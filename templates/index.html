@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Live weather, hour-by-hour temperature graph, 5-day outlook and air quality.">
+<meta name="theme-color" content="#7fd0ff">
+<title>{{ w.city ~ ' ' ~ w.temp ~ '° – ' if w }}SkyCast</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>⛅</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="{{ w.scene ~ (' night' if w.night) if w }}">
+<div class="sky" aria-hidden="true"><i class="sun"></i><div id="stars"></div><i class="cloud c1"></i><i class="cloud c2"></i><i class="cloud c3"></i><div id="fx"></div></div>
+<main>
+  <nav>
+    <a class="brand" href="/">⛅ skycast</a>
+    <div class="tools"><button id="theme" type="button" aria-label="Switch between day and night">☀️ Day</button><button id="unit" type="button" aria-label="Switch temperature unit">°C</button></div>
+  </nav>
+
+  <section class="hero">
+    <h1>How's the sky today?</h1>
+    <p>Live conditions, the next 24 hours and a 5-day outlook.</p>
+    <form action="/" id="f">
+      <input id="q" name="city" value="{{ city }}" maxlength="80" list="sugg" autocomplete="off" placeholder="Search a city, e.g. Mumbai" aria-label="City name" required>
+      <button id="loc" type="button" title="Use my location" aria-label="Use my location">📍</button>
+      <button id="go">Search</button><datalist id="sugg"></datalist>
+    </form>
+    <div class="chips" id="chips"></div>
+    {% if error %}<div class="err" role="alert">{{ error }}</div>{% endif %}
+    <noscript><div class="err">Turn on JavaScript to see the hourly graph, animations and day/night mode.</div></noscript>
+  </section>
+
+  {% if w %}
+  <section class="card">
+    <div class="top">
+      <div><small>Right now in</small><h2>{{ w.city }}{% if w.country %}<span>, {{ w.country }}</span>{% endif %}</h2></div>
+      <div class="ico" role="img" aria-label="{{ w.desc }}">{{ w.icon }}</div>
+    </div>
+    <div class="now">
+      <div id="big">{{ w.temp }}°</div>
+      <div><strong>{{ w.desc }}</strong><small>Feels like <span data-c="{{ w.feels }}">{{ w.feels }}°</span></small><br>
+        <small>High <span data-c="{{ w.hi }}">{{ w.hi }}°</span>, low <span data-c="{{ w.lo }}">{{ w.lo }}°</span></small></div>
+    </div>
+    <p class="advice {{ w.tip[0] }}"><span aria-hidden="true">💡</span> {{ w.tip[1] }}</p>
+    <div class="grid">
+      {% for ic, lab, val, ms in [("💧","Humidity",w.humidity~"%",""),("🌬️","Wind",w.wind~" m/s "~w.dir,w.wind),("🧭","Pressure",w.pressure~" hPa",""),("🔆","UV index",w.uv,""),("🍃","Air quality",w.aqi,""),("☁️","Cloud cover",w.cloud~"%",""),("🌅","Sunrise / sunset",w.sunrise~" / "~w.sunset,""),(w.moon[0],"Moon",w.moon[1],"")] %}
+      <div><small><span aria-hidden="true">{{ ic }}</span> {{ lab }}</small><b{% if ms %} data-ms="{{ ms }}" data-dir="{{ w.dir }}"{% endif %}>{{ val }}</b></div>
+      {% endfor %}
+    </div>
+    <small id="upd"></small>
+  </section>
+
+  <section class="card">
+    <h3>Temperature, hour by hour</h3><small id="hint" hidden>Scroll sideways to see all 24 hours. Tap the graph for details.</small>
+    <div class="scroll"><svg id="chart" role="img" aria-label="Hourly temperature and rain chance for the next 24 hours"></svg></div>
+  </section>
+
+  <section class="card">
+    <h3>Next 5 days</h3>
+    <div class="days">
+      {% for d in w.days %}<div><small>{{ d.d }}</small><i aria-hidden="true">{{ d.icon }}</i><b data-c="{{ d.hi }}">{{ d.hi }}°</b><small data-c="{{ d.lo }}">{{ d.lo }}°</small>{% if d.rain is not none %}<small>💧 {{ d.rain }}%</small>{% endif %}</div>{% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</main>
+<script type="application/json" id="data">{{ {"w": w, "q": city}|tojson }}</script>
+<script src="{{ url_for('static', filename='js/chart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

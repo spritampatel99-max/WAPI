@@ -1,0 +1,101 @@
+/* SkyCast styles. Colours are tokens; weather scene + day/night just swap the tokens. */
+@property --c1{syntax:"<color>";inherits:true;initial-value:#7fd0ff}
+@property --c2{syntax:"<color>";inherits:true;initial-value:#c4f6dc}
+@property --c3{syntax:"<color>";inherits:true;initial-value:#8fe3c8}
+:root{--ink:#0e3350;--mut:#46687f;--inv:#fff;--glass:rgba(255,255,255,.58);--sky:#2aa6ff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.5 "DM Sans",sans-serif;overflow-x:hidden;background:var(--c1);
+  --c1:#7fd0ff;--c2:#c4f6dc;--c3:#8fe3c8;transition:--c1 1.4s,--c2 1.4s,--c3 1.4s,color .8s}
+/* weather scenes (day) */
+.cloudy{--c1:#9fd3f2;--c2:#cfeee0;--c3:#a6dcd0}
+.rain,.storm,.fog{--c1:#93b9d6;--c2:#a9d9d0;--c3:#86abc9}
+.snow{--c1:#cfe6f7;--c2:#eaf6ff;--c3:#d4efe8}
+/* night overrides (same scenes, darker) */
+.night{--ink:#eaf7ff;--mut:#a9cbe0;--inv:#0e3350;--glass:rgba(12,44,70,.55);--c1:#0d2b4d;--c2:#145f6a;--c3:#1d4f8a}
+.night.rain,.night.storm,.night.fog{--c1:#0b2236;--c2:#17404e;--c3:#193a5c}
+.night.snow{--c1:#1a3556;--c2:#2b5a74;--c3:#2f4f7a}
+
+.sky{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.sky::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,var(--c1),var(--c2),var(--c3),var(--c1)) 0 0/300% 300%;animation:bg 22s ease infinite}
+@keyframes bg{50%{background-position:100% 100%}}
+.sun{position:absolute;top:7%;right:8%;width:130px;height:130px;border-radius:50%;background:radial-gradient(#fffbc8,#ffd54f 60%,transparent 72%);box-shadow:0 0 90px 40px rgba(255,220,100,.4);animation:pulse 6s ease-in-out infinite;transition:box-shadow 1.2s}
+.sun::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(#fff,#e4ecff 52%,transparent 68%);opacity:0;transition:opacity 1.2s}
+.night .sun{box-shadow:0 0 70px 20px rgba(200,220,255,.3)}.night .sun::after{opacity:1}
+.rain .sun,.storm .sun,.snow .sun,.fog .sun{display:none}
+.swap .sun{animation:swap 1s ease-in-out}
+@keyframes pulse{50%{transform:scale(1.08)}}
+@keyframes swap{45%,55%{transform:translateY(170px) scale(.6);opacity:0}}
+#stars{position:absolute;inset:0;opacity:0;transition:opacity 1.4s}
+.night #stars{opacity:1}.night.rain #stars,.night.storm #stars,.night.cloudy #stars,.night.fog #stars{opacity:.3}
+#stars i{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;animation:tw 3s ease-in-out infinite}
+@keyframes tw{50%{opacity:.15}}
+.cloud{position:absolute;left:-30%;width:240px;height:70px;border-radius:70px;background:rgba(255,255,255,.7);animation:drift 70s linear infinite}
+.cloud::before,.cloud::after{content:"";position:absolute;background:inherit;border-radius:50%}
+.cloud::before{width:100px;height:100px;top:-45px;left:35px}
+.cloud::after{width:70px;height:70px;top:-28px;left:120px}
+.c1{top:14%}.c2{top:40%;animation-duration:100s;animation-delay:-35s;scale:.7}.c3{top:70%;animation-duration:85s;animation-delay:-55s;opacity:.55}
+.night .cloud{background:rgba(180,210,235,.22)}.rain .cloud,.storm .cloud{background:rgba(110,135,158,.7)}
+@keyframes drift{to{left:110%}}
+#fx{position:absolute;inset:0}
+#fx i{position:absolute;top:-5%;width:2px;height:16px;background:linear-gradient(transparent,#fff);animation:fall linear infinite}
+#fx.snow i{width:7px;height:7px;border-radius:50%;background:#fff}
+@keyframes fall{to{transform:translateY(110vh)}}
+.storm .sky::after{content:"";position:absolute;inset:0;background:#fff;opacity:0;animation:flash 8s infinite}
+@keyframes flash{0%,92%,96%,100%{opacity:0}93%{opacity:.5}95%{opacity:.25}}
+
+main{position:relative;width:min(100% - 32px,860px);margin:auto;padding-bottom:36px}
+nav{display:flex;justify-content:space-between;align-items:center;height:76px}
+.brand{font:700 23px "Space Grotesk",sans-serif;letter-spacing:-1px;color:var(--ink);text-decoration:none}
+.tools{display:flex;gap:8px}
+button{font:700 13px "DM Sans",sans-serif;cursor:pointer;border:0;border-radius:12px;color:#fff;padding:12px 18px;background:linear-gradient(135deg,#0e78c9,#0a8f62);transition:transform .2s,filter .2s}
+button:hover{transform:translateY(-2px);filter:brightness(1.07)}
+button.busy{opacity:.7;pointer-events:none}
+:focus-visible{outline:3px solid #fff;outline-offset:2px}
+#unit,#theme,#loc{background:var(--glass);color:var(--ink);backdrop-filter:blur(10px)}
+.hero{text-align:center;padding:30px 0 10px}
+h1{margin:0 0 6px;font:700 clamp(38px,7vw,60px)/1.05 "Space Grotesk",sans-serif;letter-spacing:-3px;background:linear-gradient(90deg,#0b6fc2,#0a8a5f);-webkit-background-clip:text;background-clip:text;color:transparent}
+.night h1{background-image:linear-gradient(90deg,#7cc8ff,#6ff0c0)}
+.hero p{margin:0;color:var(--mut)}
+form{display:flex;gap:8px;width:min(100%,620px);margin:24px auto 0;padding:7px;background:var(--glass);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.7);border-radius:18px;box-shadow:0 12px 35px rgba(30,100,150,.15)}
+input{flex:1;min-width:0;border:0;outline:0;background:none;color:var(--ink);font:16px "DM Sans",sans-serif;padding:0 12px}
+input::placeholder{color:var(--mut)}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:14px}
+.chips a{padding:6px 14px;border-radius:99px;background:var(--glass);color:var(--ink);text-decoration:none;font-size:13px;backdrop-filter:blur(10px)}
+.err{width:min(100%,620px);margin:14px auto 0;padding:12px 16px;border-radius:12px;background:rgba(255,235,235,.9);color:#8f2b2b;text-align:left}
+
+.card{margin:16px 0;padding:26px 30px;background:var(--glass);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.65);border-radius:26px;box-shadow:0 20px 50px rgba(30,100,150,.14);animation:up .8s both}
+.card+.card{animation-delay:.15s}.card+.card+.card{animation-delay:.3s}
+@keyframes up{from{opacity:0;transform:translateY(18px)}}
+small{font-size:12px;font-weight:500;color:var(--mut)}
+.top{display:flex;justify-content:space-between;align-items:center}
+h2{margin:2px 0 0;font:700 25px "Space Grotesk",sans-serif;letter-spacing:-.7px}
+h2 span{font:400 15px "DM Sans",sans-serif;color:var(--mut)}
+.ico{font-size:68px;line-height:1;animation:float 4.5s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-8px)}}
+.now{display:flex;align-items:center;gap:24px;padding:6px 0}
+#big{font:700 clamp(76px,13vw,108px)/1 "Space Grotesk",sans-serif;letter-spacing:-6px}
+.now strong{font-size:18px;display:block}
+.advice{margin:10px 0 0;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.4)}
+.advice.warn{background:rgba(255,196,110,.6)}.night .advice.warn{background:rgba(255,160,60,.28)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+.grid div{padding:14px 16px;border-radius:16px;background:rgba(255,255,255,.34)}
+.grid b{display:block;font-size:16px}
+h3{margin:0 0 12px;font:700 17px "Space Grotesk",sans-serif}
+.scroll{overflow-x:auto;padding-bottom:6px}
+svg{display:block;height:200px;touch-action:pan-x}
+svg text{font:700 12px "DM Sans",sans-serif;text-anchor:middle;fill:var(--ink)}
+svg .h{font-weight:500;font-size:11px;fill:var(--mut)}
+svg circle{fill:#fff;stroke:#2aa6ff;stroke-width:3;r:4.5}
+svg circle.hi{stroke:#ff9f43;r:7}svg circle.lo{stroke:#8a7bff;r:6}
+.pb{fill:#2a7fff;opacity:.35}
+.ln{fill:none;stroke:url(#s);stroke-width:4;stroke-linecap:round;stroke-dasharray:3000;animation:draw 2.4s ease-out}
+@keyframes draw{from{stroke-dashoffset:3000}}
+#tip{opacity:0;pointer-events:none;transition:opacity .15s}#tip.on{opacity:1}
+#tip line{stroke:var(--mut);stroke-dasharray:3 4}#tip rect{fill:var(--ink)}#tip text{fill:var(--inv)}
+.days{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;text-align:center}
+.days div{padding:14px 4px;border-radius:16px;background:rgba(255,255,255,.34)}
+.days i{display:block;font-size:30px;font-style:normal;margin:4px 0}
+.days small{display:block}
+@media(max-width:560px){.grid{grid-template-columns:repeat(2,1fr)}.card{padding:20px 16px}.now{gap:14px}#big{letter-spacing:-4px}.ico{font-size:52px}.days{gap:6px}.days div{padding:12px 0}button{padding:11px 13px}}
+@media(prefers-reduced-motion:reduce){*,::before,::after{animation:none!important;transition:none!important}}
+.night .grid div,.night .days div,.night .advice{background:rgba(255,255,255,.12)}.night .advice.warn{background:rgba(255,160,60,.28)}
