@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyCast | Weather App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="page-shell">
+        <nav class="topbar">
+            <a class="brand" href="/"><span class="brand-mark">☀</span> skycast</a>
+            <span class="live-label"><span class="live-dot"></span> LIVE WEATHER</span>
+        </nav>
+
+        <section class="hero">
+            <p class="eyebrow">WEATHER, AT A GLANCE</p>
+            <h1>Find your city's<br><span>weather.</span></h1>
+            <p class="subtitle">A little forecast makes planning your day easier.</p>
+
+            <form class="search-form" method="POST" action="/">
+                <span class="search-icon">⌕</span>
+                <input type="text" name="city" placeholder="Search a city, e.g. Mumbai"
+                       value="{{ city }}" aria-label="City name" required>
+                <button type="submit">Search <span>→</span></button>
+            </form>
+
+            {% if error %}
+                <div class="message error">{{ error }}</div>
+            {% endif %}
+        </section>
+
+        {% if weather %}
+        <section class="weather-card">
+            <div class="card-top">
+                <div>
+                    <p class="card-label">CURRENT WEATHER</p>
+                    <h2>{{ weather.city }}<span>, {{ weather.country }}</span></h2>
+                </div>
+                <div class="weather-icon">
+                    <img src="https://openweathermap.org/img/wn/{{ weather.icon }}@2x.png"
+                         alt="{{ weather.description }}">
+                </div>
+            </div>
+
+            <div class="temperature-row">
+                <div class="temperature">{{ weather.temperature }}<sup>°C</sup></div>
+                <div class="condition">
+                    <strong>{{ weather.description }}</strong>
+                    <span>Feels like {{ weather.feels_like }}°C</span>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+            <div class="details-grid">
+                <div class="detail">
+                    <span class="detail-icon">◉</span>
+                    <div><small>HUMIDITY</small><strong>{{ weather.humidity }}%</strong></div>
+                </div>
+                <div class="detail">
+                    <span class="detail-icon">≋</span>
+                    <div><small>WIND SPEED</small><strong>{{ weather.wind }} m/s</strong></div>
+                </div>
+                <div class="detail">
+                    <span class="detail-icon">🌡</span>
+                    <div><small>FEELS LIKE</small><strong>{{ weather.feels_like }}°C</strong></div>
+                </div>
+            </div>
+            <p class="updated-note">Weather data provided by {{ weather.source or 'OpenWeatherMap' }}</p>
+        </section>
+        {% endif %}
+
+        <footer>Made for curious minds <span>✦</span></footer>
+    </main>
+</body>
+</html>
